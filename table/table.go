@@ -76,14 +76,10 @@ type checkPrototype func(string, string, LookupService, string)
 type lookupPrototype func(string, string, LookupService, string)
 type fetchPrototype func(string, string, LookupService)
 
-var updateCb updatePrototype = noUpdate
+var updateCb updatePrototype = func (token string, table string) { Updated(token); }
 var checkCb checkPrototype
 var lookupCb lookupPrototype
 var fetchCb fetchPrototype
-
-func noUpdate(table string, token string) {
-	Updated(token);
-}
 
 func Failure(token string) {
 	fmt.Printf("table-result|%s|failure\n", token)
@@ -150,16 +146,16 @@ func Dispatch() {
 		token := atoms[5]
 		switch atoms[4] {
 		case "update":
-			updateCb(token)
+			updateCb(token, table)
 
 		case "check":
-			checkCb(token, nameToLookupService(atoms[6]), strings.Join(atoms[7:], "|"))
+			checkCb(token, table, nameToLookupService(atoms[6]), strings.Join(atoms[7:], "|"))
 
 		case "lookup":
-			lookupCb(token, nameToLookupService(atoms[6]), strings.Join(atoms[7:], "|"))
+			lookupCb(token, table, nameToLookupService(atoms[6]), strings.Join(atoms[7:], "|"))
 
 		case "fetch":
-			fetchCb(token, nameToLookupService(atoms[6]))
+			fetchCb(token, table, nameToLookupService(atoms[6]))
 
 		default:
 			log.Fatalf("unsupported operation: %s", atoms[4])
