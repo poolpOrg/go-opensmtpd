@@ -76,10 +76,14 @@ type checkPrototype func(string, string, LookupService, string)
 type lookupPrototype func(string, string, LookupService, string)
 type fetchPrototype func(string, string, LookupService)
 
-var updateCb updatePrototype = Updated
+var updateCb updatePrototype = noUpdate
 var checkCb checkPrototype
 var lookupCb lookupPrototype
 var fetchCb fetchPrototype
+
+func noUpdate(table string, token string) {
+	Updated(token);
+}
 
 func Failure(token string) {
 	fmt.Printf("table-result|%s|failure\n", token)
