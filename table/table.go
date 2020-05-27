@@ -71,10 +71,10 @@ func nameToLookupService(name string) LookupService {
 	return STRING
 }
 
-type updatePrototype func(string)
-type checkPrototype func(string, LookupService, string)
-type lookupPrototype func(string, LookupService, string)
-type fetchPrototype func(string, LookupService)
+type updatePrototype func(string, string)
+type checkPrototype func(string, string, LookupService, string)
+type lookupPrototype func(string, string, LookupService, string)
+type fetchPrototype func(string, string, LookupService)
 
 var updateCb updatePrototype = Updated
 var checkCb checkPrototype
@@ -130,7 +130,7 @@ func Dispatch() {
 
 		line := scanner.Text()
 		atoms := strings.Split(line, "|")
-		if len(atoms) < 5 {
+		if len(atoms) < 6 {
 			log.Fatalf("missing atoms: %s", line)
 		}
 
@@ -142,22 +142,23 @@ func Dispatch() {
 			log.Fatalf("unsupported protocol version: %s", atoms[1])
 		}
 
-		token := atoms[4]
-		switch atoms[3] {
+		table := atoms[3]
+		token := atoms[5]
+		switch atoms[4] {
 		case "update":
 			updateCb(token)
 
 		case "check":
-			checkCb(token, nameToLookupService(atoms[5]), strings.Join(atoms[6:], "|"))
+			checkCb(token, nameToLookupService(atoms[6]), strings.Join(atoms[7:], "|"))
 
 		case "lookup":
-			lookupCb(token, nameToLookupService(atoms[5]), strings.Join(atoms[6:], "|"))
+			lookupCb(token, nameToLookupService(atoms[6]), strings.Join(atoms[7:], "|"))
 
 		case "fetch":
-			fetchCb(token, nameToLookupService(atoms[5]))
+			fetchCb(token, nameToLookupService(atoms[6]))
 
 		default:
-			log.Fatalf("unsupported operation: %s", atoms[3])
+			log.Fatalf("unsupported operation: %s", atoms[4])
 		}
 	}
 }
